@@ -1,9 +1,9 @@
 import express from "express";
+import { Request, Response, NextFunction } from "express";
+import { registerController } from "../../controllers";
 
 const router = express.Router();
 
-router.post("/", (req, res, next) => {
-    console.log("Register");
-})
+router.post("/upload", registerController.upload)
 
 export default router;

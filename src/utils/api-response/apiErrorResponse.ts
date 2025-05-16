@@ -23,13 +23,13 @@ class ApiErrorResponse extends Error implements IApiError {
 
     toJSON() {
         return {
-          name: this.name,
-          message: this.message,
-          statusCode: this.statusCode,
-          data: this.data,
-          stack: this.stack,
+            name: this.name,
+            message: this.message,
+            statusCode: this.statusCode,
+            data: this.data,
+            stack: this.stack,
         };
-      }
+    }
 }
 
 
