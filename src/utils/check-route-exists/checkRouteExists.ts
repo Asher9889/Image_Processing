@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { StatusCodes } from "http-status-codes";
-import { ApiErrorResponse } from "../"
+import { ApiErrorResponse } from "../index"
 
 
 

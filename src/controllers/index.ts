@@ -1,5 +1,6 @@
-import { upload } from "./register.controller";
+import { upload, getSimilar } from "./upload.controller";
 
-export const registerController = {
-    upload: upload
+export const uploadController = {
+    upload,
+    getSimilar
 }

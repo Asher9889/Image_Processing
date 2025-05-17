@@ -1,16 +1,19 @@
 interface IApiError {
+    status: boolean;
     statusCode: number;
     message: string;
     data?: any;
 }
 
 class ApiErrorResponse extends Error implements IApiError {
+    status: boolean;
     statusCode: number;
     data?: any;
     name: string;
 
     constructor(statusCode: number, message: string, data?: any, stack?: string) {
         super(message);
+        this.status = false;
         this.name = this.constructor.name;
         this.statusCode = statusCode;
         this.data = data || null;
