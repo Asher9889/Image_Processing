@@ -3,14 +3,20 @@ import { ApiErrorResponse, cosineSimilarity, uploadBase64Image, uploadBase64imag
 import { Image } from '../models';
 import { Image as ImageJS } from "image-js";
 import { StatusCodes } from 'http-status-codes';
+import connectMSSQL from '../db/connectMSSQL';
+import sql from "mssql";
 
 export async function uploadService(base64: string, req: Request) {
    try {
+      const pool = await connectMSSQL();
+      if (!pool) {
+         console.error("DB connection failed. Aborting insert.");
+         return;
+      }
       const { pipeline } = await import('@xenova/transformers');
 
       // Store image in a system;
-      const imageURL = await uploadBase64Image(base64, req);
-      console.log(imageURL);
+      const imageURL = await uploadBase64Image(base64, req); // to device
 
 
 
@@ -18,7 +24,48 @@ export async function uploadService(base64: string, req: Request) {
       // const url = 'https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/cats.png';
       const res = await image_feature_extractor(imageURL);
 
-      console.log("Features is", res)
+      const result = await pool.request()
+         .input('DeviceID', sql.VarChar, data.DeviceID)
+         .input('UserID', sql.VarChar, data.UserID)
+         .input('Name', sql.VarChar, data.Name)
+         .input('Pri', sql.Int, data.Pri)
+         .input('Password', sql.VarChar, data.Password)
+         .input('Card', sql.VarChar, data.Card)
+         .input('DeviceGroup', sql.VarChar, data.DeviceGroup)
+         .input('TimeZone', sql.VarChar, data.TimeZone)
+         .input('Verify', sql.Int, data.Verify)
+         .input('AccesstimeFrom', sql.DateTime, data.AccesstimeFrom)
+         .input('AccessTimeTo', sql.DateTime, data.AccessTimeTo)
+         .input('UpdatedOn', sql.DateTime, new Date())
+         .input('UpdateFlag', sql.Int, data.UpdateFlag)
+         .input('IsDeleted', sql.Bit, data.IsDeleted)
+         .input('Source', sql.VarChar, data.Source)
+         .input('CreatedDate', sql.DateTime, new Date())
+         .input('aliasid', sql.VarChar, data.aliasid)
+         .input('Card1', sql.VarChar, data.Card1)
+         .input('Card2', sql.VarChar, data.Card2)
+         .input('Card3', sql.VarChar, data.Card3)
+         .input('Card4', sql.VarChar, data.Card4)
+         .query(`
+        INSERT INTO [iDMS].[dbo].[Userdetail]
+        (
+          DeviceID, UserID, Name, Pri, Password, Card, DeviceGroup,
+          TimeZone, Verify, AccesstimeFrom, AccessTimeTo, UpdatedOn,
+          UpdateFlag, IsDeleted, Source, CreatedDate, aliasid,
+          Card1, Card2, Card3, Card4
+        )
+        VALUES
+        (
+          @DeviceID, @UserID, @Name, @Pri, @Password, @Card, @DeviceGroup,
+          @TimeZone, @Verify, @AccesstimeFrom, @AccessTimeTo, @UpdatedOn,
+          @UpdateFlag, @IsDeleted, @Source, @CreatedDate, @aliasid,
+          @Card1, @Card2, @Card3, @Card4
+        )
+      `);
+
+      console.log('✅ Insert successful:', result.rowsAffected);
+
+
 
       const imgObj = new Image({
          imagePath: imageURL,
@@ -58,23 +105,18 @@ export async function getSimilarService(image: string, req: Request) {
       // now fetch all the vectors stored in the db.
       const allImagesVector = await Image.find({}, { vector: 1, imagePath: 1 });
 
-      
+
 
       const results = allImagesVector.map((doc) => {
          const similarity = cosineSimilarity(Array.from(resp.data), doc.vector);
          return { _id: doc._id, imagePath: doc.imagePath, similarity };
       });
 
-      console.log("result is", results)
 
       results.sort((a, b) => b.similarity - a.similarity);
       const mostMatching = results.slice(0, 1);
-
-
-
-      console.log("from similar service", mostMatching);
       return mostMatching;
    } catch (error) {
-      console.log(error);
+      throw error;
    }
 }

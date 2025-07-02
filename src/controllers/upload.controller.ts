@@ -8,6 +8,7 @@ import { uploadControllerService } from "../services";
 export async function upload(req: Request, res: Response, next: NextFunction):Promise<Response | void> {
     try {
         const { image } = req.body;
+        console.log(image)
         if (!image) throw new ApiErrorResponse(StatusCodes.BAD_REQUEST, "Please provide valid image")
         // const { pipeline } = await import('@xenova/transformers');
 
@@ -22,10 +23,7 @@ export async function upload(req: Request, res: Response, next: NextFunction):Pr
         }
         return res.status(StatusCodes.OK).json(new ApiSuccessResponse(StatusCodes.OK, "Image Saved successfully"))
     } catch (error) {
-        console.log(error)
-        if (error) {
-            next(error);
-        }
+        next(error);
     }
 
 }
