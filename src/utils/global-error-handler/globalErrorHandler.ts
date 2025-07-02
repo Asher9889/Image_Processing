@@ -11,6 +11,7 @@ function globalErrorHandler(err:any, req:Request, res:Response, next:NextFunctio
         const stack = err.stack;
         return res.status(statusCode).json(new ApiErrorResponse(statusCode, messgae, data, stack));
     }else{
+        console.log(err)
         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(new ApiErrorResponse(StatusCodes.INTERNAL_SERVER_ERROR,"Internal Server Error", null));
     }
 }

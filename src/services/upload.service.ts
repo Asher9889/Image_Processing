@@ -8,6 +8,7 @@ import sql from "mssql";
 
 export async function uploadService(base64: string, req: Request) {
    try {
+      const data = req.body;
       const pool = await connectMSSQL();
       if (!pool) {
          console.error("DB connection failed. Aborting insert.");
@@ -67,18 +68,39 @@ export async function uploadService(base64: string, req: Request) {
 
 
 
-      const imgObj = new Image({
-         imagePath: imageURL,
-         vector: Array.from(res.data),
-         vectorType: res.type
-      })
-      const data = await imgObj.save();
-      if (!data._id) {
-         throw new ApiErrorResponse(StatusCodes.INTERNAL_SERVER_ERROR, "Failed to save image. try again")
-      }
+      // const imgObj = new Image({
+      //    imagePath: imageURL,
+      //    vector: Array.from(res.data),
+      //    vectorType: res.type
+      // })
+      // Insert image details
+      const vectorJson = JSON.stringify({ vector: Array.from(res.data) });
+      await pool.request()
+         .input('DeviceID', sql.VarChar(250), data.DeviceID)
+         .input('UserID', sql.VarChar(50), data.UserID)
+         .input('ImagePath', sql.NVarChar(500), imageURL)
+         .input('Vector', sql.NVarChar(sql.MAX), vectorJson)
+         .input('VectorType', sql.NVarChar(50), res.type)
+         .query(`
+        INSERT INTO [iDMS].[dbo].[UserImages]
+        (DeviceID, UserID, ImagePath, Vector, VectorType, UpdatedOn)
+        VALUES
+        (@DeviceID, @UserID, @ImagePath, @Vector, @VectorType, GETDATE())
+      `);
+
+      console.log('✅ UserImages insert successful');
+      // const data = await imgObj.save();
+      // if (!data._id) {
+      //    throw new ApiErrorResponse(StatusCodes.INTERNAL_SERVER_ERROR, "Failed to save image. try again")
+      // }
       return true;
-   } catch (error) {
-      throw error;
+   } catch (error: any) {
+      if (error instanceof ApiErrorResponse) {
+         throw error;
+      } else {
+
+         throw new ApiErrorResponse(StatusCodes.BAD_REQUEST, error.message);
+      }
    }
 }
 
@@ -99,21 +121,51 @@ export async function getSimilarService(image: string, req: Request) {
 
       const image_feature_extractor = await pipeline('image-feature-extraction', 'Xenova/clip-vit-base-patch32');
       const resp = await image_feature_extractor(imgUrl); // returns vector
-      if (!resp) {
+      if (!resp || !resp.data) {
          throw new ApiErrorResponse(StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to process the image');
       }
-      // now fetch all the vectors stored in the db.
-      const allImagesVector = await Image.find({}, { vector: 1, imagePath: 1 });
 
+      const inputVector = Array.from(resp.data);
 
+      // Fetch vectors from MSSQL
+      const pool = await connectMSSQL();
+      if (!pool) {
+         console.error("DB connection failed. Aborting insert.");
+         return;
+      }
+      const result = await pool.request().query(`
+         SELECT ImageID, UserID, ImagePath, Vector
+         FROM [iDMS].[dbo].[UserImages]
+      `);
 
-      const results = allImagesVector.map((doc) => {
-         const similarity = cosineSimilarity(Array.from(resp.data), doc.vector);
-         return { _id: doc._id, imagePath: doc.imagePath, similarity };
+      const images = result.recordset;
+
+      if (images.length === 0) {
+         throw new ApiErrorResponse(StatusCodes.NOT_FOUND, "No images found in database");
+      }
+
+      // Compute similarity
+      const results = images.map((row) => {
+         let storedVector: number[] = [];
+         try {
+            const vectorObj = JSON.parse(row.Vector);
+            storedVector = vectorObj.vector;
+         } catch (err) {
+            console.error(`Error parsing vector for ImageID ${row.ImageID}:`, err);
+         }
+
+         const similarity = cosineSimilarity(inputVector, storedVector);
+         return {
+
+            ImageID: row.ImageID,
+            UserID: row.UserID,
+            imagePath: row.ImagePath,
+            similarity
+         };
       });
 
-
       results.sort((a, b) => b.similarity - a.similarity);
+
       const mostMatching = results.slice(0, 1);
       return mostMatching;
    } catch (error) {

@@ -5,11 +5,10 @@ import { Image } from "../models";
 import { uploadControllerService } from "../services";
 
 
-export async function upload(req: Request, res: Response, next: NextFunction):Promise<Response | void> {
+export async function upload(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
     try {
-        const { image } = req.body;
-        console.log(image)
-        if (!image) throw new ApiErrorResponse(StatusCodes.BAD_REQUEST, "Please provide valid image")
+        const { image, UserID, Name } = req.body;
+        if (!image || !UserID || !Name) throw new ApiErrorResponse(StatusCodes.BAD_REQUEST, "Please provide valid image")
         // const { pipeline } = await import('@xenova/transformers');
 
         // // Store image in a system;
@@ -18,10 +17,13 @@ export async function upload(req: Request, res: Response, next: NextFunction):Pr
 
         const response = await uploadControllerService.uploadService(image, req);
 
+
+
+
         if (!response) {
             throw new ApiErrorResponse(StatusCodes.INTERNAL_SERVER_ERROR, "Failed to save image. try again")
         }
-        return res.status(StatusCodes.OK).json(new ApiSuccessResponse(StatusCodes.OK, "Image Saved successfully"))
+        return res.status(StatusCodes.OK).json(new ApiSuccessResponse(StatusCodes.OK, "User & Image Saved successfully"))
     } catch (error) {
         next(error);
     }
@@ -41,6 +43,6 @@ export async function getSimilar(req: Request, res: Response, next: NextFunction
         }
         return res.status(StatusCodes.OK).json(new ApiSuccessResponse(StatusCodes.OK, "Data fetched successfully", resp))
     } catch (error) {
-        next(error); 
+        next(error);
     }
 }
