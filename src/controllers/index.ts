@@ -1,6 +1,7 @@
-import { upload, getSimilar } from "./upload.controller";
+import { upload, getSimilar, markAttendance } from "./upload.controller";
 
 export const uploadController = {
     upload,
-    getSimilar
+    getSimilar,
+    markAttendance
 }

@@ -74,10 +74,11 @@ export async function uploadService(base64: string, req: Request) {
       //    vectorType: res.type
       // })
       // Insert image details
+      
       const vectorJson = JSON.stringify({ vector: Array.from(res.data) });
       await pool.request()
-         .input('DeviceID', sql.VarChar(250), data.DeviceID)
-         .input('UserID', sql.VarChar(50), data.UserID)
+         .input('DeviceID', sql.VarChar(250), req.body.DeviceID)
+         .input('UserID', sql.VarChar(50), req.body.UserID)
          .input('ImagePath', sql.NVarChar(500), imageURL)
          .input('Vector', sql.NVarChar(sql.MAX), vectorJson)
          .input('VectorType', sql.NVarChar(50), res.type)
@@ -134,7 +135,7 @@ export async function getSimilarService(image: string, req: Request) {
          return;
       }
       const result = await pool.request().query(`
-         SELECT ImageID, UserID, ImagePath, Vector
+         SELECT DeviceID, UserID, ImagePath, Vector
          FROM [iDMS].[dbo].[UserImages]
       `);
 
@@ -157,7 +158,7 @@ export async function getSimilarService(image: string, req: Request) {
          const similarity = cosineSimilarity(inputVector, storedVector);
          return {
 
-            ImageID: row.ImageID,
+            DeviceID: row.DeviceID,
             UserID: row.UserID,
             imagePath: row.ImagePath,
             similarity
@@ -172,3 +173,4 @@ export async function getSimilarService(image: string, req: Request) {
       throw error;
    }
 }
+
