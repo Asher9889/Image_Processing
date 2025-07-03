@@ -43,3 +43,30 @@ A concise overview of the tools and libraries used in this project, organized by
    - Return matching documents with imagePath.
 - Frontend displays images using path like `http://your-server/uploads/1715862692-image.png`
 
+## For Deploy the Project
+
+- ```pm2 start ecosystem.config.cjs```
+- create ecosystem.config.cjs file 
+   - Add these content
+      - 
+```javascript      
+module.exports = {
+    apps: [
+        {
+            name: "faceAttendance_image_detection_backend",
+            script: "app.js",
+            // cwd: "D:/Saurabh/face_attendance_mern_app/deployedApp",
+            interpreter: "node",
+            env: {
+                PORT: "8154",
+                MONGODB_URL: "",
+                DB_NAME: "",
+                MSSQL_USER: "",
+                MSSQL_PASSWORD: "",
+                MSSQL_SERVER: "",
+                MSSQL_PORT: "",
+                MSSQL_DATABASE: "",
+            }
+        }
+    ]
+}
