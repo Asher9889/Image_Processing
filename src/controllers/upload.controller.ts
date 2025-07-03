@@ -76,6 +76,14 @@ export async function markAttendance(req: Request, res: Response, next: NextFunc
 
     } = req.body;
 
+    function getISTDate() {
+        const dateUTC = new Date();
+      
+        // IST offset = 330 minutes (5 hours 30 minutes)
+        const istOffset = 330 * 60000; 
+        return new Date(dateUTC.getTime() + istOffset);
+      }
+
     if (!DeviceID || typeof DeviceID === "string" && DeviceID.trim() === "") {
         throw new ApiErrorResponse(StatusCodes.BAD_REQUEST, "Please provide valid DeviceID")
     }
@@ -102,8 +110,8 @@ export async function markAttendance(req: Request, res: Response, next: NextFunc
             .input('AttState', sql.VarChar(50), AttState || null)
             .input('VerifyMode', sql.VarChar(50), VerifyMode || "Mobile")
             .input('WorkCode', sql.VarChar(50), WorkCode || null)
-            .input('AttDateTime', sql.DateTime, new Date())
-            .input('UpdateedOn', sql.DateTime, new Date())
+            .input('AttDateTime', sql.DateTime, getISTDate())
+            .input('UpdateedOn', sql.DateTime, getISTDate())
             .input('CTemp', sql.VarChar(50), CTemp || null)
             .input('FTemp', sql.VarChar(50), FTemp || null)
             .input('MaskStatus', sql.VarChar(50), MaskStatus || null)
