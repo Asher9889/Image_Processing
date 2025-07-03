@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "nodemon ./src/app.ts",
     "build": "tsc",
-    "esbuild": "esbuild dist/app.js --bundle --platform=node --outfile=build/app.js --external:onnxruntime-node --external:sharp"
+    "esbuild": "esbuild dist/app.js --bundle --platform=node --outfile=build/app.js --external:onnxruntime-node --external:sharp --external:@xenova/transformers"
   },
   "keywords": [],
   "author": "",

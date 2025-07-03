@@ -25,46 +25,46 @@ export async function uploadService(base64: string, req: Request) {
       // const url = 'https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/cats.png';
       const res = await image_feature_extractor(imageURL);
 
-      const result = await pool.request()
-         .input('DeviceID', sql.VarChar, data.DeviceID)
-         .input('UserID', sql.VarChar, data.UserID)
-         .input('Name', sql.VarChar, data.Name)
-         .input('Pri', sql.Int, data.Pri)
-         .input('Password', sql.VarChar, data.Password)
-         .input('Card', sql.VarChar, data.Card)
-         .input('DeviceGroup', sql.VarChar, data.DeviceGroup)
-         .input('TimeZone', sql.VarChar, data.TimeZone)
-         .input('Verify', sql.Int, data.Verify)
-         .input('AccesstimeFrom', sql.DateTime, data.AccesstimeFrom)
-         .input('AccessTimeTo', sql.DateTime, data.AccessTimeTo)
-         .input('UpdatedOn', sql.DateTime, new Date())
-         .input('UpdateFlag', sql.Int, data.UpdateFlag)
-         .input('IsDeleted', sql.Bit, data.IsDeleted)
-         .input('Source', sql.VarChar, data.Source)
-         .input('CreatedDate', sql.DateTime, new Date())
-         .input('aliasid', sql.VarChar, data.aliasid)
-         .input('Card1', sql.VarChar, data.Card1)
-         .input('Card2', sql.VarChar, data.Card2)
-         .input('Card3', sql.VarChar, data.Card3)
-         .input('Card4', sql.VarChar, data.Card4)
-         .query(`
-        INSERT INTO [iDMS].[dbo].[Userdetail]
-        (
-          DeviceID, UserID, Name, Pri, Password, Card, DeviceGroup,
-          TimeZone, Verify, AccesstimeFrom, AccessTimeTo, UpdatedOn,
-          UpdateFlag, IsDeleted, Source, CreatedDate, aliasid,
-          Card1, Card2, Card3, Card4
-        )
-        VALUES
-        (
-          @DeviceID, @UserID, @Name, @Pri, @Password, @Card, @DeviceGroup,
-          @TimeZone, @Verify, @AccesstimeFrom, @AccessTimeTo, @UpdatedOn,
-          @UpdateFlag, @IsDeleted, @Source, @CreatedDate, @aliasid,
-          @Card1, @Card2, @Card3, @Card4
-        )
-      `);
+      // const result = await pool.request()
+      //    .input('DeviceID', sql.VarChar, data.DeviceID)
+      //    .input('UserID', sql.VarChar, data.UserID)
+      //    .input('Name', sql.VarChar, data.Name)
+      //    .input('Pri', sql.Int, data.Pri)
+      //    .input('Password', sql.VarChar, data.Password)
+      //    .input('Card', sql.VarChar, data.Card)
+      //    .input('DeviceGroup', sql.VarChar, data.DeviceGroup)
+      //    .input('TimeZone', sql.VarChar, data.TimeZone)
+      //    .input('Verify', sql.Int, data.Verify)
+      //    .input('AccesstimeFrom', sql.DateTime, data.AccesstimeFrom)
+      //    .input('AccessTimeTo', sql.DateTime, data.AccessTimeTo)
+      //    .input('UpdatedOn', sql.DateTime, new Date())
+      //    .input('UpdateFlag', sql.Int, data.UpdateFlag)
+      //    .input('IsDeleted', sql.Bit, data.IsDeleted)
+      //    .input('Source', sql.VarChar, data.Source)
+      //    .input('CreatedDate', sql.DateTime, new Date())
+      //    .input('aliasid', sql.VarChar, data.aliasid)
+      //    .input('Card1', sql.VarChar, data.Card1)
+      //    .input('Card2', sql.VarChar, data.Card2)
+      //    .input('Card3', sql.VarChar, data.Card3)
+      //    .input('Card4', sql.VarChar, data.Card4)
+      //    .query(`
+      //   INSERT INTO [iDMS].[dbo].[Userdetail]
+      //   (
+      //     DeviceID, UserID, Name, Pri, Password, Card, DeviceGroup,
+      //     TimeZone, Verify, AccesstimeFrom, AccessTimeTo, UpdatedOn,
+      //     UpdateFlag, IsDeleted, Source, CreatedDate, aliasid,
+      //     Card1, Card2, Card3, Card4
+      //   )
+      //   VALUES
+      //   (
+      //     @DeviceID, @UserID, @Name, @Pri, @Password, @Card, @DeviceGroup,
+      //     @TimeZone, @Verify, @AccesstimeFrom, @AccessTimeTo, @UpdatedOn,
+      //     @UpdateFlag, @IsDeleted, @Source, @CreatedDate, @aliasid,
+      //     @Card1, @Card2, @Card3, @Card4
+      //   )
+      // `);
 
-      console.log('✅ Insert successful:', result.rowsAffected);
+      // console.log('✅ Insert successful:', result.rowsAffected);
 
 
 

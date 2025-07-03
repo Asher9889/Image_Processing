@@ -1,18 +1,18 @@
 import express, { NextFunction, Request, Response } from 'express';
-import config from './config';
+import config from './config/index';
 import cors from 'cors';
-import apiRoutes from "./routes";
-import { checkRouteExists, globalErrorHandler } from './utils';
+import apiRoutes from "./routes/index";
+import { checkRouteExists, globalErrorHandler } from './utils/index';
 import path from 'path';
-import connectMongoDB from './db/connectMongoDB';
+// import connectMongoDB from './db/connectMongoDB';
 import connectMSSQL from './db/connectMSSQL';
 
 const app = express();
 
 
-connectMongoDB().catch((err) => {
-    console.log(err)
-})
+// connectMongoDB().catch((err) => {
+//     console.log(err)
+// })
 connectMSSQL().catch((err) => {
     console.log(err)
 });
